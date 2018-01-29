@@ -1,51 +1,34 @@
 import os
 import sys
 import logging
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-
+import json
+import falcon
+from falcon_cors import CORS
 
 from serve import get_model_api
-
-
-# define the app
-app = Flask(__name__)
-CORS(app) # needed for cross-domain requests, allow everything by default
 model_api = get_model_api() # load the model
 
+public_cors = CORS(
+                allow_all_origins=True,
+                allow_all_headers=True,
+                allow_all_methods=True)
 
-# API route
-@app.route('/api', methods=['POST'])
-def api():
-    """API function
-    All model-specific logic to be defined in the get_model_api() function
-    """
-    input_data = request.json
-    output_data = model_api(input_data)
-    response = jsonify(output_data)
-    return response
+api = falcon.API(middleware=[public_cors.middleware])
 
+class ModelRoute:
 
-@app.route('/')
-def index():
-    return "Index API"
+    def on_post(self, req, resp):
+        """API function
+        All model-specific logic to be defined in the get_model_api() function
+        """
+        if req.content_length:
+            input_data = json.loads(req.stream.read().decode('utf-8'))
+        else:
+            print 'missing parameters'
+            return
 
-# HTTP Errors handlers
-@app.errorhandler(404)
-def url_error(e):
-    return """
-    Wrong URL!
-    <pre>{}</pre>""".format(e), 404
+        diagnostic = input_data["diagnostic"]
+        print "diagnostic: " + diagnostic.encode('utf-8')
+        resp.media = model_api(diagnostic, "CCAM")
 
-
-@app.errorhandler(500)
-def server_error(e):
-    return """
-    An internal error occurred: <pre>{}</pre>
-    See logs for full stacktrace.
-    """.format(e), 500
-
-
-if __name__ == '__main__':
-    # This is used when running locally.
-    app.run(host='0.0.0.0', debug=True)
+api.add_route('/api', ModelRoute())

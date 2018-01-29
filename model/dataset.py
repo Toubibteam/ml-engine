@@ -19,7 +19,9 @@ class CodeDataset:
     def __iter__(self):
         for code_id, description  in self._data.items():
             des = self.preprocess(description['description'])
-            yield code_id, des, description['type'] 
+            if des is not None:
+                yield code_id, des, description['type']
+
 
     def get_description(self, code_id):
         return self._data[code_id]
@@ -28,11 +30,14 @@ class CodeDataset:
     def preprocess(self, description):
         """Preprocess description into a list of words or ids"""
         result = simple_tok(description)
+        if result is None:
+            return None
+
+        result = map(clean, result)
         result = [tok for tok in result]
         if self._vocab is not None:
             result = [self._vocab.tok_to_id(tok) for tok in result]
         return result
-
 
 
 def load_csv_file(path):
@@ -48,10 +53,10 @@ def load_csv_file(path):
     data = {}
     if df is not None:
         for _, row in df.iterrows():
-            print row
+            # print row
             code_id = row["Code"]
             description = row["Description"]
-            data[code_id] = {'description' : description, 'type':row['Type']}
+            data[code_id] = { 'description' : description, 'type':row['Type'] }
     return data
 
 
@@ -64,6 +69,9 @@ def simple_tok(sentence):
         words_raw: (list of words) with no accents and no punctuation
 
     """
+    if sentence is None:
+        return None
+
     s = "".join(c for c in sentence if c not in PUNC) # remove punc
     words_raw = s.strip().split(" ")  # split by space
     words_raw = map(clean, words_raw) # remove accents
