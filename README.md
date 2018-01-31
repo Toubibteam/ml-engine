@@ -27,8 +27,24 @@ The output is an array of objects
 
 - The directory `model` contains all model-specific logic
 - The directory `docs` contains a demo of a client (to be hosted on github pages for instance)
+- The directory `test` contains all the unit tests performed on the functions of the project
 - The files `app.py` and `serve.py` are for the Falcon API
 - The files `requirements.txt`, `runtime.txt` and `Procfile` are for deployment on Heroku
+
+
+## Tests
+
+For a better tracking of the bugs, a good pratice is to test the functions written in the packages.
+
+
+#### Foreword
+
+Each package has its own test file. The test files can be found in the `test` directory that clones the project architecture. They are names following the convention: `test_<name of the associated package>`.
+
+
+#### Running the tests
+
+All the tests can be run at once using the package `pytest` (get it by running `sudo pip install -U pytest` :o). Then, run the `pytest` command at the root of the project directory.
 
 
 ## Heroku

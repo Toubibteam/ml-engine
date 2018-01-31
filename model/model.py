@@ -35,12 +35,14 @@ class Model:
         return _descriptions
 
 
+    @classmethod
     def similarity(self, query, description):
         q = set(query)
         d = set(description)
         return len(q.intersection(d))
 
 
+    @classmethod
     def description_representation(self, description):
         return description
 
