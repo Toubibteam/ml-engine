@@ -44,7 +44,7 @@ class Model:
         return self._code_dataset.preprocess(query)
 
     def change_query(self,query,type_code) : 
-        if type_code =='ccam' :
+        if type_code =='CCAM' :
             syn = ccam
         else :
             syn = cim
@@ -55,9 +55,14 @@ class Model:
                 new_query += word + ' '
             else :
                 if word in syn.keys() :
-                    new_query += syn[word][0] + ' '
+                    temp = syn[word]
+                    synonymes = [t['syn'] for t in temp]
+                    weights = [t['weight'] for t in temp]
+                    weights, synonymes = zip(*sorted(zip(weights, synonymes)))
+                    new_query = synonymes[0] + ' '
                 else :
                     new_query += ''
+        return new_query
 
     def predict(self, query,type_code):
         query = change_query(query,type_code)

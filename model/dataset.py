@@ -13,7 +13,7 @@ class CodeDataset:
         self._path = path
         self._vocab = vocab
         self._data = load_csv_file(self._path)
-        # self._stemmer = Stemmer()
+        self._stemmer = Stemmer()
 
 
     def __iter__(self):
@@ -28,7 +28,7 @@ class CodeDataset:
     def preprocess(self, description):
         """Preprocess description into a list of words or ids"""
         result = simple_tok(description)
-        result = [tok for tok in result]
+        result = [clean(self._stemmer.stem(tok)) for tok in result]
         if self._vocab is not None:
             result = [self._vocab.tok_to_id(tok) for tok in result]
         return result
@@ -48,7 +48,6 @@ def load_csv_file(path):
     data = {}
     if df is not None:
         for _, row in df.iterrows():
-            print row
             code_id = row["Code"]
             description = row["Description"]
             data[code_id] = {'description' : description, 'type':row['Type']}
