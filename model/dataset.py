@@ -13,7 +13,7 @@ class CodeDataset:
         self._path = path
         self._vocab = vocab
         self._data = load_csv_file(self._path)
-        # self._stemmer = Stemmer()
+        self._stemmer = Stemmer()
 
 
     def __iter__(self):
@@ -33,8 +33,6 @@ class CodeDataset:
         if result is None:
             return None
 
-        result = map(clean, result)
-        result = [tok for tok in result]
         if self._vocab is not None:
             result = [self._vocab.tok_to_id(tok) for tok in result]
         return result
@@ -53,7 +51,6 @@ def load_csv_file(path):
     data = {}
     if df is not None:
         for _, row in df.iterrows():
-            # print row
             code_id = row["Code"]
             description = row["Description"]
             data[code_id] = { 'description' : description, 'type':row['Type'] }
@@ -72,7 +69,7 @@ def simple_tok(sentence):
     if sentence is None:
         return None
 
-    s = "".join(c for c in sentence if c not in PUNC) # remove punc
+    s = "".join(c.replace('"','') for c in sentence if c not in PUNC) # remove punc
     words_raw = s.strip().split(" ")  # split by space
     words_raw = map(clean, words_raw) # remove accents
     return words_raw
