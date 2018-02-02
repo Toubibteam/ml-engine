@@ -13,8 +13,6 @@ def add_voc(vocab):
 	return vocab
 
 if __name__ == "__main__":
-    dataset = CodeDataset("data/all_code.csv")
-    vocab = build_vocab(dataset)
-    write_vocab(vocab, "data/vocab.txt")
+ccc
     all_vocab = add_voc(vocab)
     write_vocab(all_vocab, "data/vocab_all.txt")

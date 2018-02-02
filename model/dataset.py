@@ -63,7 +63,7 @@ def simple_tok(sentence):
         words_raw: (list of words) with no accents and no punctuation
 
     """
-    s = "".join(c for c in sentence if c not in PUNC) # remove punc
+    s = "".join(c.replace('"','') for c in sentence if c not in PUNC) # remove punc
     words_raw = s.strip().split(" ")  # split by space
     words_raw = map(clean, words_raw) # remove accents
     return words_raw
