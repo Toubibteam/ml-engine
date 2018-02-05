@@ -46,10 +46,10 @@ class Model:
     def query_representation(self, query):
         return self._code_dataset.preprocess(query)
 
-    def change_query(self,query) :
-        if type_code == self._type_code :
+    def change_query(self, query, type_code) :
+        if type_code == "CCAM" :
             syn = self._ccam
-        if type_code == self._type_code :
+        if type_code == "CIM" :
             syn = self._cim
         query = simple_tok(query)
         new_query = ''
@@ -68,12 +68,12 @@ class Model:
         return new_query
 
 
-    def predict(self, query,type_code):
-        query = self.change_query(query,type_code)
+    def predict(self, query, type_code):
+        query = self.change_query(query, type_code)
         query = self.query_representation(query)
         results = {}
         for code_id, descriptions in self._descriptions.items():
-            if descriptions['type'] == type_code : 
+            if descriptions['type'] == type_code :
                 metric = self.similarity(query, descriptions['description'])
                 if metric > 0:
                     description = self._code_dataset.get_description(code_id)

@@ -1,9 +1,13 @@
-from model.model import Model
-from model.similarcode import SimilarCodeModel
+from os import path
 import json
 import pymongo
 
-client = pymongo.MongoClient(NOM_CLIENT)
+from model.model import Model
+from model.similarcode import SimilarCodeModel
+from model.vocab import Vocab
+from model.dataset import CodeDataset
+
+client = pymongo.MongoClient("mongodb://localhost/toubib")
 
 
 def _to_json(code_id, metric, description,tarif):
@@ -29,7 +33,7 @@ def _sorted_best_50(dico) :
 
 ### Search Codes
 def get_code():
-    model_ccam = Model()
+    model = Model()
 
     def model_code_api(input_data):
         results_ccam = model.predict(input_data,'CCAM')
@@ -45,31 +49,32 @@ def get_code():
 def get_similarcode():
     db = client.NOM_DB
     model = SimilarCodeModel(db)
-    all_vocab = Vocab(folder + "/data/vocab_all.txt")
-    code_dataset = CodeDataset(folder + "/data/all_code.csv", self._all_vocab)
+
+    folder = path.abspath(path.split(__file__)[0])
+    all_vocab = Vocab(folder + "/model/data/vocab_all.txt")
+    code_dataset = CodeDataset(folder + "/model/data/all_code.csv", all_vocab)
 
     def model_similarcode_api(input_data):
         cim,ccam = model.same_code(input_data)
 
         similar_codes = []
 
-        for code in cim : 
+        for code in cim :
             description = code_dataset[code]
             similar_codes.append({
-                'type' : 'CIM'
-                'code' : code, 
+                'type' : 'CIM',
+                'code' : code,
                 'description' : description
                 })
 
-        for code in ccam : 
+        for code in ccam :
             description = code_dataset[code]
             similar_codes.append({
-                'type' : 'CCAM'
-                'code' : code, 
+                'type' : 'CCAM',
+                'code' : code,
                 'description' : description
                 })
 
         return similar_codes
 
     return model_similarcode_api
-
