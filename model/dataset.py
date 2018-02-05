@@ -20,7 +20,7 @@ class CodeDataset:
         for code_id, description  in self._data.items():
             des = self.preprocess(description['description'])
             if des is not None:
-                yield code_id, des, description['type']
+                yield code_id, des, description['type'], description['tarif']
 
 
     def get_description(self, code_id):
@@ -47,13 +47,13 @@ def load_csv_file(path):
         d: (dict) d[code_id] = description
 
     """
-    df = pd.read_csv(path, sep=";",names=['Code','Type','Description']) if path is not None else None
+    df = pd.read_csv(path, sep=";",names=['Code','Type','Description','Tarif']) if path is not None else None
     data = {}
     if df is not None:
         for _, row in df.iterrows():
             code_id = row["Code"]
             description = row["Description"]
-            data[code_id] = { 'description' : description, 'type':row['Type'] }
+            data[code_id] = { 'description' : description, 'type':row['Type'], 'tarif':row['Tarif'] }
     return data
 
 
