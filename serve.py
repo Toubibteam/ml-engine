@@ -13,15 +13,12 @@ def _sorted_best_50(dico) :
     codes = []
     res_iter = sorted(dico.items(), key=lambda t: t[1]["metric"],reverse=True)
     for code_id, details in res_iter:
-        description = details["description"]
-        metric = details["metric"]
-        # TODO: add the following line once the attribute has been added in dataset or it breaks the API
-        # tarif = details["tarif"]
 
+        # TODO: add tarif once the attribute has been added in dataset or it breaks the API
         codes.append({
-            "code_id": code_id,
-            "metric": metric,
-            "description": description
+            "type": details["type"],
+            "code": code_id,
+            "description": details["description"]
         })
 
     if len(codes) > 50 :
