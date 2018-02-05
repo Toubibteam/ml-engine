@@ -6,7 +6,8 @@ import falcon
 from falcon_cors import CORS
 
 from serve import get_model_api
-model_api = get_model_api() # load the model
+model_code_api = get_code() # load the model
+model_similarcode_api = get_similarcode()
 
 public_cors = CORS(
                 allow_all_origins=True,
@@ -29,6 +30,6 @@ class ModelRoute:
 
         diagnostic = input_data["diagnostic"]
         print "diagnostic: " + diagnostic.encode('utf-8')
-        resp.media = model_api(diagnostic, "CCAM")
+        resp.media = model_code_api(diagnostic, "CCAM")
 
 api.add_route('/api', ModelRoute())
