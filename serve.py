@@ -9,24 +9,21 @@ from model.dataset import CodeDataset
 
 client = pymongo.MongoClient("mongodb://localhost/toubib")
 
-
-def _to_json(code_id, metric, description,tarif):
-    obj = {
-        "code_id": code_id,
-        "metric": metric,
-        "description": description,
-        "tarif" : tarif
-    }
-    return obj
-
 def _sorted_best_50(dico) :
     codes = []
     res_iter = sorted(dico.items(), key=lambda t: t[1]["metric"],reverse=True)
     for code_id, details in res_iter:
         description = details["description"]
         metric = details["metric"]
-        tarif = details["tarif"]
-        codes.append(_to_json(code_id, metric, description,tarif))
+        # TODO: add the following line once the attribute has been added in dataset or it breaks the API
+        # tarif = details["tarif"]
+
+        codes.append({
+            "code_id": code_id,
+            "metric": metric,
+            "description": description
+        })
+
     if len(codes) > 50 :
         codes = codes[:50]
     return codes
