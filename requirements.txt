@@ -3,6 +3,7 @@ scipy
 numpy
 pandas
 nltk
+pymongo
 falcon
 falcon-cors
 gunicorn
