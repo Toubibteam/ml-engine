@@ -7,7 +7,7 @@ from model.similarcode import SimilarCodeModel
 from model.vocab import Vocab
 from model.dataset import CodeDataset
 
-client = pymongo.MongoClient("mongodb://localhost/toubib")
+client = pymongo.MongoClient(NOM_CLIENT)
 
 def _sorted_best_50(dico) :
     codes = []
@@ -27,7 +27,7 @@ def _sorted_best_50(dico) :
 
 ### Search Codes
 def get_code():
-    model = Model()
+    model_ccam = Model()
 
     def model_code_api(input_data):
         results_ccam = model.predict(input_data,'CCAM')
@@ -41,7 +41,7 @@ def get_code():
 
 ### Similar Codes
 def get_similarcode():
-    db = client.NOM_DB
+    db = client.codes
     model = SimilarCodeModel(db)
 
     folder = path.abspath(path.split(__file__)[0])
@@ -56,7 +56,7 @@ def get_similarcode():
         for code in cim :
             description = code_dataset[code]
             similar_codes.append({
-                'type' : 'CIM',
+                'type' : 'CIM'
                 'code' : code,
                 'description' : description
                 })
@@ -64,7 +64,7 @@ def get_similarcode():
         for code in ccam :
             description = code_dataset[code]
             similar_codes.append({
-                'type' : 'CCAM',
+                'type' : 'CCAM'
                 'code' : code,
                 'description' : description
                 })

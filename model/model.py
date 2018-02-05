@@ -68,17 +68,17 @@ class Model:
         return new_query
 
 
-    def predict(self, query, type_code):
-        query = self.change_query(query, type_code)
+    def predict(self, query,type_code):
+        query = self.change_query(query,type_code)
         query = self.query_representation(query)
         results = {}
         for code_id, descriptions in self._descriptions.items():
             if descriptions['type'] == type_code :
                 metric = self.similarity(query, descriptions['description'])
                 if metric > 0:
-                    description = self._code_dataset.get_description(code_id)['description']
+                    description = self._code_dataset.get_description(code_id)
                     results[code_id] = {"metric": metric,
-                                        "description": description,
+                                        "description": descriptions['description'],
                                         "tarif": descriptions['tarif'],
                                         "type" : descriptions['type']}
         return results
