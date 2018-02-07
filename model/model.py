@@ -76,9 +76,9 @@ class Model:
             if descriptions['type'] == type_code :
                 metric = self.similarity(query, descriptions['description'])
                 if metric > 0:
-                    description = self._code_dataset.get_description(code_id)
+                    description = self._code_dataset.get_description(code_id)['description']
                     results[code_id] = {"metric": metric,
-                                        "description": descriptions['description'],
+                                        "description": description,
                                         "tarif": descriptions['tarif'],
                                         "type" : descriptions['type']}
         return results
