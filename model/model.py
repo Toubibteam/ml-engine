@@ -2,6 +2,7 @@ from os import path
 import tensorflow as tf
 import numpy as np
 import json
+import pymongo
 
 from dataset import CodeDataset, simple_tok, clean
 from vocab import Vocab
@@ -9,8 +10,7 @@ from vocab import Vocab
 class Model:
     """Class to compute representation of query and descriptions"""
 
-    def __init__(self):
-        # self._vocab = Vocab("./data/vocab.txt")
+    def __init__(self,db):
         folder = path.abspath(path.split(__file__)[0])
         with open(folder + '/data/vocab.txt','r') as df :
             self._vocab = df.read().split('\n')
@@ -20,7 +20,7 @@ class Model:
             self._cim = json.load(df)
 
         self._all_vocab = Vocab(folder + "/data/vocab_all.txt")
-        self._code_dataset = CodeDataset(folder + "/data/all_code.csv", self._all_vocab)
+        self._code_dataset = CodeDataset(db, self._all_vocab)
         self._descriptions = self._build_descriptions()
         print "model loaded"
 
@@ -28,9 +28,8 @@ class Model:
     def _build_descriptions(self):
         """Load representation once and for all"""
         _descriptions = {}
-        for code_id, description, type_, tarif in self._code_dataset:
-            rep = self.description_representation(description)
-            _descriptions[code_id] = {'description' : rep, 'tarif' : tarif, 'type' : type_}
+        for code, descriptions in self._code_dataset :
+            _descriptions[code] = descriptions
         return _descriptions
 
     @classmethod
@@ -46,13 +45,10 @@ class Model:
     def query_representation(self, query):
         return self._code_dataset.preprocess(query)
 
-    def change_query(self, query, type_code) :
-        if type_code == "CCAM" :
-            syn = self._ccam
-        if type_code == "CIM" :
-            syn = self._cim
+    def change_query(self,query,type_code) :
         query = simple_tok(query)
         new_query = ''
+        syn = self._ccam if type_code == 'CCAM' else self._cim
         for word in query :
             if word in self._vocab :
                 new_query += word + ' '
@@ -67,25 +63,42 @@ class Model:
                     new_query += ''
         return new_query
 
-
-    def predict(self, query,type_code):
+    def predict(self, query,db,type_code):
         query = self.change_query(query,type_code)
         query = self.query_representation(query)
         results = {}
         for code_id, descriptions in self._descriptions.items():
-            if descriptions['type'] == type_code :
-                metric = self.similarity(query, descriptions['description'])
-                if metric > 0:
-                    description = self._code_dataset.get_description(code_id)
+            if len(descriptions) > 1 :
+                occurence = 0
+                for description in descriptions :
+                    metric = self.similarity(query, description)
+                    if metric > 0:
+                        occurence += 1
+                if occurence > 1 :
+                    code_des = self._code_dataset.get_description(code_id)
                     results[code_id] = {"metric": metric,
-                                        "description": descriptions['description'],
-                                        "tarif": descriptions['tarif'],
-                                        "type" : descriptions['type']}
+                                            "description": code_des['Odescription'],
+                                            "tarif": code_des['tarif'],
+                                            'type' : codes_des['type']}
+            else :
+                metric = self.similarity(query, descriptions[0])
+                if metric > 0 :
+                    code_des = self._code_dataset.get_description(code_id)
+                    results[code_id] = {"metric": metric,
+                                        "description": code_des['Odescription'],
+                                        "tarif": code_des['tarif'],
+                                        'type' : codes_des['type']}
+
         return results
+
 
 if __name__ == "__main__":
     import json
 
-    model = Model()
-    results = model.predict("muscles","CCAM")
+    client = pymongo.MongoClient('NOM_CLIENT')
+    db = client.codes
+    ccam = db.ccam
+
+    model_ccam = Model(ccam)
+    results = model_ccam.predict("muscles","CCAM")
     print results

@@ -1,30 +1,29 @@
 import unicodedata
 import pandas as pd
+import pymongo
 from nltk.stem import PorterStemmer as Stemmer
 
 from config import UNK, PUNC
-from vocab import build_vocab
-
 
 class CodeDataset:
     """Loads codes and their description with some preprocessing"""
 
-    def __init__(self, path, vocab=None):
+    def __init__(self, db, vocab=None):
         self._path = path
         self._vocab = vocab
-        self._data = load_csv_file(self._path)
+        self._data = db
         self._stemmer = Stemmer()
 
 
     def __iter__(self):
-        for code_id, description  in self._data.items():
-            des = self.preprocess(description['description'])
-            if des is not None:
-                yield code_id, des, description['type'], description['tarif']
+        for element in self._data.find() :
+            descriptions = [self.preprocess(d) for d in element['Descriptions']]
+            if descriptions is not None:
+                yield element['Code'], descriptions
 
 
     def get_description(self, code_id):
-        return self._data[code_id]
+        return self._data.find_one({'code' : code_id})
 
 
     def preprocess(self, description):
@@ -36,25 +35,6 @@ class CodeDataset:
         if self._vocab is not None:
             result = [self._vocab.tok_to_id(tok) for tok in result]
         return result
-
-
-def load_csv_file(path):
-    """
-    Args:
-        path: (string) path to csv file with code and description
-
-    Returns:
-        d: (dict) d[code_id] = description
-
-    """
-    df = pd.read_csv(path, sep=";",names=['Code','Type','Description','Tarif']) if path is not None else None
-    data = {}
-    if df is not None:
-        for _, row in df.iterrows():
-            code_id = row["Code"]
-            description = row["Description"]
-            data[code_id] = { 'description' : description, 'type':row['Type'], 'tarif':row['Tarif'] }
-    return data
 
 
 def simple_tok(sentence):

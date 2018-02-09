@@ -27,11 +27,15 @@ def _sorted_best_50(dico) :
 
 ### Search Codes
 def get_code():
-    model_ccam = Model()
+    db = client.codes
+    cim = db.cim
+    ccam = db.ccam
+    model_ccam = Model(ccam)
+    model_cim = Model(cim)
 
     def model_code_api(input_data):
-        results_ccam = model.predict(input_data,'CCAM')
-        results_cim = model.predict(input_data,'CIM')
+        results_ccam = model_ccam.predict(input_data,'CCAM')
+        results_cim = model_cim.predict(input_data,'CIM')
 
         codes = _sorted_best_50(results_cim) + _sorted_best_50(results_ccam)
 

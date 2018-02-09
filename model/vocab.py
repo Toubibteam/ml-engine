@@ -1,7 +1,6 @@
 import pandas as pd
 from collections import Counter
 
-
 from config import UNK
 
 
@@ -33,7 +32,7 @@ def build_vocab(code_dataset, min_count=1):
     """Build vocab from dataset"""
     print("Building vocab...")
     c = Counter()
-    for code_id, description,type_ in code_dataset:
+    for code_id, description in code_dataset:
         c.update(description)
     vocab = [tok for tok, count in c.items() if count >= min_count]
     print("- done. {}/{} tokens added to vocab.".format(len(vocab), len(c)))
