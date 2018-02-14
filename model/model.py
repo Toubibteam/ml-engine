@@ -63,13 +63,13 @@ class Model:
 
 
     @classmethod
-    def similarity(self, query, description):
+    def similarity(cls, query, description):
         q = set(query)
         d = set(description)
         return len(q.intersection(d))
 
     @classmethod
-    def description_representation(self, description):
+    def description_representation(cls, description):
         return description
 
     def query_representation(self, query):
