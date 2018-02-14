@@ -11,6 +11,8 @@ class Model:
     """Class to compute representation of query and descriptions"""
 
     """ Class attributes """
+    # (int) number of instances created
+    _instances = 0
     # (array) contains all the vocabulary to create the token / id convertion
     _vocab = []
     # (dict) contains all the ccam synonyms
@@ -22,10 +24,8 @@ class Model:
         folder = path.abspath(path.split(__file__)[0])
         with open(folder + '/data/vocab.txt','r') as df :
             self.__class__._vocab = df.read().split('\n')
-        with open(folder + '/data/ccam.json','r') as df :
-            self.__class__._ccam_syn = json.load(df)
-        with open(folder + '/data/cim.json','r') as df :
-            self.__class__._cim_syn = json.load(df)
+
+        self.__class__.load_synonyms(db)
 
         self._all_vocab = Vocab(folder + "/data/vocab_all.txt")
         self._code_dataset = CodeDataset(db, self._all_vocab)
@@ -39,6 +39,28 @@ class Model:
         for code, descriptions in self._code_dataset :
             _descriptions[code] = descriptions
         return _descriptions
+
+
+    @classmethod
+    def load_synonyms(cls, db):
+        """ Load ccam and cim synonyms from database
+
+        Args:
+            cls: (object) the class itself
+            db: (object) connection to the database
+
+        Returns:
+            none
+
+        """
+        if cls._instances == 0:
+            for code in db.ccam_synonyms.find():
+                cls._ccam_syn[code["word"]] = code["syn"]
+            for code in db.cim_synonyms.find():
+                cls._cim_syn[code["word"]] = code["syn"]
+
+        cls._instances += 1
+
 
     @classmethod
     def similarity(self, query, description):
@@ -103,8 +125,9 @@ if __name__ == "__main__":
 
     client = pymongo.MongoClient("mongodb://localhost/codes")
     db = client.codes
-    ccam = db.ccam
+    ccam = db
 
     model_ccam = Model(ccam)
+    model_ccam2 = Model(ccam)
     results = model_ccam.predict("muscles","CCAM")
     print results
