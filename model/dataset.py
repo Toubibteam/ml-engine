@@ -9,7 +9,6 @@ class CodeDataset:
     """Loads codes and their description with some preprocessing"""
 
     def __init__(self, db, vocab=None):
-        self._path = path
         self._vocab = vocab
         self._data = db
         self._stemmer = Stemmer()
