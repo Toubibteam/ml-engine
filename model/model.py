@@ -10,14 +10,22 @@ from vocab import Vocab
 class Model:
     """Class to compute representation of query and descriptions"""
 
+    """ Class attributes """
+    # (array) contains all the vocabulary to create the token / id convertion
+    _vocab = []
+    # (dict) contains all the ccam synonyms
+    _ccam_syn = {}
+    # (dict) contains all the cim synonyms
+    _cim_syn = {}
+
     def __init__(self,db):
         folder = path.abspath(path.split(__file__)[0])
         with open(folder + '/data/vocab.txt','r') as df :
-            self._vocab = df.read().split('\n')
+            self.__class__._vocab = df.read().split('\n')
         with open(folder + '/data/ccam.json','r') as df :
-            self._ccam = json.load(df)
+            self.__class__._ccam_syn = json.load(df)
         with open(folder + '/data/cim.json','r') as df :
-            self._cim = json.load(df)
+            self.__class__._cim_syn = json.load(df)
 
         self._all_vocab = Vocab(folder + "/data/vocab_all.txt")
         self._code_dataset = CodeDataset(db, self._all_vocab)
@@ -48,9 +56,9 @@ class Model:
     def change_query(self,query,type_code) :
         query = simple_tok(query)
         new_query = ''
-        syn = self._ccam if type_code == 'CCAM' else self._cim
+        syn = self.__class__._ccam_syn if type_code == 'CCAM' else self.__class__._cim_syn
         for word in query :
-            if word in self._vocab :
+            if word in self.__class__._vocab :
                 new_query += word + ' '
             else :
                 if word in syn.keys() :
