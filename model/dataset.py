@@ -22,7 +22,7 @@ class CodeDataset:
 
 
     def get_description(self, code_id):
-        return self._data.find_one({'code' : code_id})
+        return self._data.find_one({'Code' : code_id})
 
 
     def preprocess(self, description):
