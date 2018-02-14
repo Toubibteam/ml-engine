@@ -68,7 +68,7 @@ class Model:
         query = self.query_representation(query)
         results = {}
         for code_id, descriptions in self._descriptions.items():
-            if len(descriptions) > 1 :
+            if len(descriptions) > 2 :
                 occurence = 0
                 for description in descriptions :
                     metric = self.similarity(query, description)
@@ -77,17 +77,15 @@ class Model:
                 if occurence > 1 :
                     code_des = self._code_dataset.get_description(code_id)
                     results[code_id] = {"metric": metric,
-                                            "description": code_des['Odescription'],
-                                            "tarif": code_des['tarif'],
-                                            'type' : code_des['type']}
+                                        "description": code_des["descriptions"][0],
+                                        "type" : type_code}
             else :
                 metric = self.similarity(query, descriptions[0])
                 if metric > 0 :
                     code_des = self._code_dataset.get_description(code_id)
                     results[code_id] = {"metric": metric,
-                                        "description": code_des['Odescription'],
-                                        "tarif": code_des['tarif'],
-                                        'type' : code_des['type']}
+                                        "description": code_des["descriptions"][0],
+                                        "type" : type_code}
 
         return results
 

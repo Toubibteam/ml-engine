@@ -16,13 +16,13 @@ class CodeDataset:
 
     def __iter__(self):
         for element in self._data.find() :
-            descriptions = [self.preprocess(d) for d in element['Descriptions']]
+            descriptions = [self.preprocess(d) for d in element['descriptions']]
             if descriptions is not None:
-                yield element['Code'], descriptions
+                yield element['code'], descriptions
 
 
     def get_description(self, code_id):
-        return self._data.find_one({'Code' : code_id})
+        return self._data.find_one({'code' : code_id})
 
 
     def preprocess(self, description):
