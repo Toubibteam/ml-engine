@@ -28,8 +28,6 @@ class CodeDataset:
     def preprocess(self, description):
         """Preprocess description into a list of words or ids"""
         result = simple_tok(description)
-        if result is None:
-            return None
 
         if self._vocab is not None:
             result = [self._vocab.tok_to_id(tok) for tok in result]
@@ -45,8 +43,8 @@ def simple_tok(sentence):
         words_raw: (list of words) with no accents and no punctuation
 
     """
-    if sentence is None:
-        return None
+    if sentence is None or isinstance(sentence, (int, long)):
+        return [UNK]
 
     s = "".join(c.replace('"','') for c in sentence if c not in PUNC) # remove punc
     words_raw = s.strip().split(" ")  # split by space
