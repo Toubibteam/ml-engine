@@ -95,7 +95,7 @@ class Model:
 if __name__ == "__main__":
     import json
 
-    client = pymongo.MongoClient('NOM_CLIENT')
+    client = pymongo.MongoClient("mongodb://localhost/codes")
     db = client.codes
     ccam = db.ccam
 
