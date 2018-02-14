@@ -48,9 +48,9 @@ Here are the parameters used for the project:
 
 - database: `codes`
 
-- collections: `cim`, `ccam`
+- collections: `cim`, `ccam`, `cim_synonyms`, `ccam_synonyms`
 
-- json files: `CIM10.json`, `CCAM_V50.json`
+- json files: `CIM10.json`, `CCAM_V50.json`, `cim_synonyms.json`, `ccam_synonyms.json`
 
 You may need to add the `--jsonArray` option if the json has an array shape instead of a simple object.
 
