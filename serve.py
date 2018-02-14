@@ -7,7 +7,9 @@ from model.similarcode import SimilarCodeModel
 from model.vocab import Vocab
 from model.dataset import CodeDataset
 
-client = pymongo.MongoClient(NOM_CLIENT)
+from config import MONGODB_URI
+
+client = pymongo.MongoClient(MONGODB_URI)
 
 def _sorted_best_50(dico) :
     codes = []
