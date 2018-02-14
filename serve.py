@@ -42,37 +42,3 @@ def get_code():
         return codes
 
     return model_code_api
-
-### Similar Codes
-def get_similarcode():
-    db = client.codes
-    model = SimilarCodeModel(db)
-
-    folder = path.abspath(path.split(__file__)[0])
-    all_vocab = Vocab(folder + "/model/data/vocab_all.txt")
-    code_dataset = CodeDataset(folder + "/model/data/all_code.csv", all_vocab)
-
-    def model_similarcode_api(input_data):
-        cim,ccam = model.same_code(input_data)
-
-        similar_codes = []
-
-        for code in cim :
-            description = code_dataset[code]
-            similar_codes.append({
-                'type' : 'CIM'
-                'code' : code,
-                'description' : description
-                })
-
-        for code in ccam :
-            description = code_dataset[code]
-            similar_codes.append({
-                'type' : 'CCAM'
-                'code' : code,
-                'description' : description
-                })
-
-        return similar_codes
-
-    return model_similarcode_api

@@ -5,7 +5,7 @@ import json
 import falcon
 from falcon_cors import CORS
 
-from serve import get_code, get_similarcode
+from serve import get_code
 
 model_code_api = get_code() # load the model
 
