@@ -63,7 +63,7 @@ class Model:
                     new_query += ''
         return new_query
 
-    def predict(self, query,db,type_code):
+    def predict(self, query, type_code):
         query = self.change_query(query,type_code)
         query = self.query_representation(query)
         results = {}
@@ -79,7 +79,7 @@ class Model:
                     results[code_id] = {"metric": metric,
                                             "description": code_des['Odescription'],
                                             "tarif": code_des['tarif'],
-                                            'type' : codes_des['type']}
+                                            'type' : code_des['type']}
             else :
                 metric = self.similarity(query, descriptions[0])
                 if metric > 0 :
@@ -87,7 +87,7 @@ class Model:
                     results[code_id] = {"metric": metric,
                                         "description": code_des['Odescription'],
                                         "tarif": code_des['tarif'],
-                                        'type' : codes_des['type']}
+                                        'type' : code_des['type']}
 
         return results
 
