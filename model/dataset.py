@@ -24,13 +24,6 @@ class CodeDataset:
         print "dataset loaded"
 
 
-    def __iter__(self):
-        for element in self._data.find() :
-            descriptions = [self.preprocess(d) for d in element['descriptions']]
-            if descriptions is not None:
-                yield element['code'], descriptions
-
-
     @classmethod
     def formatCCAMCode(cls, code):
         """ Format a CCAM code from database to the expected format for processing
@@ -113,6 +106,28 @@ class CodeDataset:
             return None
         else:
             return codes[code_id]
+
+
+    def build_descriptions(self, type_code):
+        """ Build descriptions for a specific set of codes
+
+        Args:
+            self: (object) class instance
+            type_code: (string) either "CCAM" or "CIM"
+
+        Returns:
+            (object) a generator to process descriptions one after an other that returns
+                code: (string, array) id of the code
+                descriptions: (array) preprocessed descriptions
+
+        """
+        codes = self.__class__._ccam_codes if type_code == "CCAM" else self.__class__._cim_codes
+
+        for code in codes:
+            details = codes[code]
+            descriptions = [self.preprocess(d) for d in details["descriptions"]]
+            if descriptions is not None:
+                yield code, descriptions
 
 
     def preprocess(self, description):

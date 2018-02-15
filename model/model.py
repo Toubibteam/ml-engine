@@ -17,27 +17,43 @@ class Model:
     _vocab = []
     # (object) handle the token / id convertion
     _all_vocab = None
+    # (object) handle the preprocessing of codes descriptions
+    _code_dataset = None
     # (dict) contains all the ccam synonyms
     _ccam_syn = {}
     # (dict) contains all the cim synonyms
     _cim_syn = {}
+    # (dict) contains all the ccam preprocessed descriptions. The keys are the code ids
+    _ccam_descriptions = {}
+    # (dict) contains all the cim preprocessed descriptions. The keys are the code ids
+    _cim_descriptions = {}
 
     def __init__(self,db):
         self.__class__.load_vocabs()
         self.__class__.load_synonyms(db)
 
-        self._code_dataset = CodeDataset(db, self.__class__._all_vocab)
-        self._descriptions = self._build_descriptions()
+        self.__class__._code_dataset = CodeDataset(db, self.__class__._all_vocab)
+        self.__class__.build_descriptions()
         self.__class__._instances += 1
         print "model loaded"
 
 
-    def _build_descriptions(self):
-        """Load representation once and for all"""
-        _descriptions = {}
-        for code, descriptions in self._code_dataset :
-            _descriptions[code] = descriptions
-        return _descriptions
+    @classmethod
+    def build_descriptions(cls):
+        """ Load representations once and for all
+
+        Args:
+            cls: (object) the class itself
+
+        Returns:
+            none
+
+        """
+        if cls._instances == 0:
+            for code, descriptions in cls._code_dataset.build_descriptions("CCAM"):
+                cls._ccam_descriptions[code] = descriptions
+            for code, descriptions in cls._code_dataset.build_descriptions("CIM"):
+                cls._cim_descriptions[code] = descriptions
 
 
     @classmethod
@@ -89,7 +105,7 @@ class Model:
         return description
 
     def query_representation(self, query):
-        return self._code_dataset.preprocess(query)
+        return self.__class__._code_dataset.preprocess(query)
 
     def change_query(self,query,type_code) :
         query = simple_tok(query)
@@ -113,7 +129,8 @@ class Model:
         query = self.change_query(query,type_code)
         query = self.query_representation(query)
         results = {}
-        for code_id, descriptions in self._descriptions.items():
+        codes_descriptions = self.__class__._ccam_descriptions if type_code == 'CCAM' else self.__class__._cim_descriptions
+        for code_id, descriptions in codes_descriptions.items():
             if len(descriptions) > 2 :
                 occurence = 0
                 for description in descriptions :
@@ -121,7 +138,7 @@ class Model:
                     if metric > 0:
                         occurence += 1
                 if occurence > 1 :
-                    code_des = self._code_dataset.get_description(code_id, type_code)
+                    code_des = self.__class__._code_dataset.get_description(code_id, type_code)
                     if code_des is not None:
                         results[code_id] = {
                             "metric": metric,
@@ -131,7 +148,7 @@ class Model:
             else :
                 metric = self.similarity(query, descriptions[0])
                 if metric > 0 :
-                    code_des = self._code_dataset.get_description(code_id, type_code)
+                    code_des = self.__class__._code_dataset.get_description(code_id, type_code)
                     if code_des is not None:
                         results[code_id] = {
                             "metric": metric,
