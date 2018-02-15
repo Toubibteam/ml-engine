@@ -8,10 +8,20 @@ from config import UNK, PUNC
 class CodeDataset:
     """Loads codes and their description with some preprocessing"""
 
+    """ Class attributes """
+    # (int) number of instances created
+    _instances = 0
+    # (dict) contains all the ccam codes
+    _ccam_codes = {}
+    # (dict) contains all the cim codes
+    _cim_codes = {}
+
     def __init__(self, db, vocab=None):
         self._vocab = vocab
-        self._data = db
         self._stemmer = Stemmer()
+        self.__class__.loadCodes(db)
+        self.__class__._instances += 1
+        print "dataset loaded"
 
 
     def __iter__(self):
@@ -19,6 +29,70 @@ class CodeDataset:
             descriptions = [self.preprocess(d) for d in element['descriptions']]
             if descriptions is not None:
                 yield element['code'], descriptions
+
+
+    @classmethod
+    def formatCCAMCode(cls, code):
+        """ Format a CCAM code from database to the expected format for processing
+
+        Args:
+            cls: (object) the class itself
+            code: (object) ccam code from database
+
+        Returns:
+            key: (string) key to refer to in dictionnary
+            value: (object) formated ccam code
+
+        """
+        key = code["code"]
+        value = {
+            "descriptions": code["descriptions"],
+            "parent": code["parent"]
+        }
+        return key, value
+
+
+    @classmethod
+    def formatCIMCode(cls, code):
+        """ Format a CIM code from database to the expected format for processing
+
+        Args:
+            cls: (object) the class itself
+            code: (object) cim code from database
+
+        Returns:
+            key: (string) key to refer to in dictionnary
+            value: (object) formated cim code
+
+        """
+        key = code["code"]
+        value = {
+            "descriptions": code["descriptions"],
+            "chapter_nb": code["chapter_nb"]
+        }
+        return key, value
+
+
+    @classmethod
+    def loadCodes(cls, db):
+        """ Load ccam and cim codes from database
+
+        Args:
+            cls: (object) the class itself
+            db: (object) connection to the database
+
+        Returns:
+            none
+
+        """
+        if cls._instances == 0:
+            for code in db.ccam.find():
+                key, value = cls.formatCCAMCode(code)
+                cls._ccam_codes[key] = value
+
+            for code in db.cim.find():
+                key, value = cls.formatCIMCode(code)
+                cls._cim_codes[key] = value
 
 
     def get_description(self, code_id):
