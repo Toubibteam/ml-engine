@@ -14,12 +14,9 @@ The output is an array of objects
 
 ```json
 {
-  "code_id": "The code DIMs and TIMs are looking for",
-  "description": {
-    "description": "The description of the code",
-    "type": "Either CCAM or CIM"
-  },
-  "metric": "An indicator of how well the code matches the user's query. The higher the better"
+  "code": "The code DIMs and TIMs are looking for",
+  "description": "The description of the code",
+  "type": "Either CCAM or CIM"
 }
 ```
 
