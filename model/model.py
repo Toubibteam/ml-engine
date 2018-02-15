@@ -23,15 +23,12 @@ class Model:
     _cim_syn = {}
 
     def __init__(self,db):
-        folder = path.abspath(path.split(__file__)[0])
-        with open(folder + '/data/vocab.txt','r') as df :
-            self.__class__._vocab = df.read().split('\n')
-
+        self.__class__.load_vocabs()
         self.__class__.load_synonyms(db)
 
-        self.__class__._all_vocab = Vocab(folder + "/data/vocab_all.txt")
         self._code_dataset = CodeDataset(db, self.__class__._all_vocab)
         self._descriptions = self._build_descriptions()
+        self.__class__._instances += 1
         print "model loaded"
 
 
@@ -41,6 +38,25 @@ class Model:
         for code, descriptions in self._code_dataset :
             _descriptions[code] = descriptions
         return _descriptions
+
+
+    @classmethod
+    def load_vocabs(cls):
+        """ Load vocabularies from files
+
+        Args:
+            cls: (object) the class itself
+
+        Returns:
+            none
+
+        """
+        if cls._instances == 0:
+            folder = path.abspath(path.split(__file__)[0])
+            with open(folder + '/data/vocab.txt','r') as df :
+                cls._vocab = df.read().split('\n')
+
+            cls._all_vocab = Vocab(folder + "/data/vocab_all.txt")
 
 
     @classmethod
@@ -60,8 +76,6 @@ class Model:
                 cls._ccam_syn[code["word"]] = code["syn"]
             for code in db.cim_synonyms.find():
                 cls._cim_syn[code["word"]] = code["syn"]
-
-        cls._instances += 1
 
 
     @classmethod
