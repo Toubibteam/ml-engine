@@ -6,7 +6,7 @@ from model.model import Model
 from model.vocab import Vocab
 from model.dataset import CodeDataset
 
-from config import MONGODB_URI
+from config import MONGODB_URI, MONGODB_DB_NAME
 
 client = pymongo.MongoClient(MONGODB_URI)
 
@@ -28,7 +28,7 @@ def _sorted_best_50(dico) :
 
 ### Search Codes
 def get_code():
-    db = client.codes
+    db = client[MONGODB_DB_NAME]
     model = Model(db)
 
     def model_code_api(input_data):
