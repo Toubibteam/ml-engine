@@ -13,8 +13,10 @@ class Model:
     """ Class attributes """
     # (int) number of instances created
     _instances = 0
-    # (array) contains all the vocabulary to create the token / id convertion
+    # (array) contains all the vocabulary to enrich queries
     _vocab = []
+    # (object) handle the token / id convertion
+    _all_vocab = None
     # (dict) contains all the ccam synonyms
     _ccam_syn = {}
     # (dict) contains all the cim synonyms
@@ -27,8 +29,8 @@ class Model:
 
         self.__class__.load_synonyms(db)
 
-        self._all_vocab = Vocab(folder + "/data/vocab_all.txt")
-        self._code_dataset = CodeDataset(db, self._all_vocab)
+        self.__class__._all_vocab = Vocab(folder + "/data/vocab_all.txt")
+        self._code_dataset = CodeDataset(db, self.__class__._all_vocab)
         self._descriptions = self._build_descriptions()
         print "model loaded"
 
