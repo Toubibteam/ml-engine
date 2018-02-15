@@ -167,6 +167,5 @@ if __name__ == "__main__":
     ccam = db
 
     model_ccam = Model(ccam)
-    model_ccam2 = Model(ccam)
     results = model_ccam.predict("muscles","CCAM")
     print results
