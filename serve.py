@@ -3,7 +3,6 @@ import json
 import pymongo
 
 from model.model import Model
-from model.similarcode import SimilarCodeModel
 from model.vocab import Vocab
 from model.dataset import CodeDataset
 
