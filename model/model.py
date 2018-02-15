@@ -121,17 +121,23 @@ class Model:
                     if metric > 0:
                         occurence += 1
                 if occurence > 1 :
-                    code_des = self._code_dataset.get_description(code_id)
-                    results[code_id] = {"metric": metric,
-                                        "description": code_des["descriptions"][0],
-                                        "type" : type_code}
+                    code_des = self._code_dataset.get_description(code_id, type_code)
+                    if code_des is not None:
+                        results[code_id] = {
+                            "metric": metric,
+                            "description": code_des["descriptions"][0],
+                            "type" : type_code
+                        }
             else :
                 metric = self.similarity(query, descriptions[0])
                 if metric > 0 :
-                    code_des = self._code_dataset.get_description(code_id)
-                    results[code_id] = {"metric": metric,
-                                        "description": code_des["descriptions"][0],
-                                        "type" : type_code}
+                    code_des = self._code_dataset.get_description(code_id, type_code)
+                    if code_des is not None:
+                        results[code_id] = {
+                            "metric": metric,
+                            "description": code_des["descriptions"][0],
+                            "type" : type_code
+                        }
 
         return results
 

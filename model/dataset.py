@@ -95,8 +95,24 @@ class CodeDataset:
                 cls._cim_codes[key] = value
 
 
-    def get_description(self, code_id):
-        return self._data.find_one({'code' : code_id})
+    def get_description(self, code_id, type_code):
+        """ Get the details of a code
+
+        Args:
+            self: (object) class instance
+            code_id: (string, object) id of the code
+            type_code: (string) either "CCAM" or "CIM"
+
+        Returns:
+            (object) details of the code, None if not in the dict
+
+        """
+        codes = self.__class__._ccam_codes if type_code == "CCAM" else self.__class__._cim_codes
+
+        if code_id not in codes:
+            return None
+        else:
+            return codes[code_id]
 
 
     def preprocess(self, description):
