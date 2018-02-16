@@ -49,15 +49,17 @@ Here are the parameters used for the project:
 
 - json files: `CIM10.json`, `CCAM_V50.json`, `cim_synonyms.json`, `ccam_synonyms.json`
 
+As the `mongoimport` commands imports the data contained in the file without cleaning the collection before, the `--drop` option can come in handy to perform a clean before the importation. It has to be placed just after the `<collection>` parameter.
+
 You may need to add the `--jsonArray` option if the json has an array shape instead of a simple object.
 
-#### Clean Database
+#### Mongo Shell
 
-`mongoimport` imports the data contained in the file in the specified collection without cleaning it before. If a clean is first required, use the `mongo` command to run the mongo shell. Once launched, proceed as follow:
+To connect to the database use the `mongo` command to run the mongo shell. Once launched, proceed as follow:
 
 1. switch to the right database: `use <database>`
 
-2. clean the collection: `db.<collection>.drop()`
+2. query a collection: `db.<collection>.find()`
 
 3. leave the shell: `Ctrl + d`
 
