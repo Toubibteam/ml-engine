@@ -1,7 +1,5 @@
 import unicodedata
-import pandas as pd
 import pymongo
-from nltk.stem import PorterStemmer as Stemmer
 
 from config import UNK, PUNC
 
@@ -18,7 +16,6 @@ class CodeDataset:
 
     def __init__(self, db, vocab=None):
         self._vocab = vocab
-        self._stemmer = Stemmer()
         self.__class__.loadCodes(db)
         self.__class__._instances += 1
         print "dataset loaded"

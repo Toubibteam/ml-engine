@@ -1,6 +1,4 @@
 from os import path
-import tensorflow as tf
-import numpy as np
 import json
 import pymongo
 
