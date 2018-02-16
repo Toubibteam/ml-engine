@@ -14,12 +14,9 @@ The output is an array of objects
 
 ```json
 {
-  "code_id": "The code DIMs and TIMs are looking for",
-  "description": {
-    "description": "The description of the code",
-    "type": "Either CCAM or CIM"
-  },
-  "metric": "An indicator of how well the code matches the user's query. The higher the better"
+  "code": "The code DIMs and TIMs are looking for",
+  "description": "The description of the code",
+  "type": "Either CCAM or CIM"
 }
 ```
 
@@ -31,6 +28,40 @@ The output is an array of objects
 - The files `app.py` and `serve.py` are for the Falcon API
 - The files `requirements.txt`, `runtime.txt` and `Procfile` are for deployment on Heroku
 
+
+## MongoDB
+
+#### Set up
+
+To run the project you first need to install a mongoDB server on your computer by following the instructions provided on their [website](https://docs.mongodb.com/).
+
+#### Provide Database
+
+To upload data to the database, use the `mongoimport` command:
+
+`mongoimport -d <database> -c <collection> --file <json file>`
+
+Here are the parameters used for the project:
+
+- database: `codes`
+
+- collections: `cim`, `ccam`, `cim_synonyms`, `ccam_synonyms`
+
+- json files: `CIM10.json`, `CCAM_V50.json`, `cim_synonyms.json`, `ccam_synonyms.json`
+
+As the `mongoimport` commands imports the data contained in the file without cleaning the collection before, the `--drop` option can come in handy to perform a clean before the importation. It has to be placed just after the `<collection>` parameter.
+
+You may need to add the `--jsonArray` option if the json has an array shape instead of a simple object.
+
+#### Mongo Shell
+
+To connect to the database use the `mongo` command to run the mongo shell. Once launched, proceed as follow:
+
+1. switch to the right database: `use <database>`
+
+2. query a collection: `db.<collection>.find()`
+
+3. leave the shell: `Ctrl + d`
 
 ## Tests
 
@@ -56,3 +87,7 @@ git add .
 git commit -m "<new changes for deployment>"
 git push heroku master
 ```
+
+## External documentation
+
+- [Understanding the *yield* keyword (stackoverflow)](https://stackoverflow.com/questions/231767/what-does-the-yield-keyword-do?page=1&tab=votes#tab-top)

@@ -1,39 +1,66 @@
-import pandas as pd
 from collections import Counter
-
 
 from config import UNK
 
 
 class Vocab(object):
-    """Class to handle tokens <-> preprocessing <-> ids"""
+    """ Class to handle the conversion between tokens and ids """
 
     def __init__(self, filename):
-        self._filename = filename
-        self.load_vocab()
+        self.load_vocab(filename)
 
 
-    def load_vocab(self):
+    def load_vocab(self, filename):
+        """ Load vocabulary from a text file and convert tokens to ids
+
+        Args:
+            self: (object) the class instance
+            filename: (string) path to the file containing the list of tokens
+
+        Returns:
+            none
+
+        """
         special_tokens = [UNK]
-        self._tok_to_id = load_tok_to_id(self._filename, special_tokens)
-        self._id_to_tok = {idx: tok for tok, idx in self._tok_to_id.iteritems()}
-        self.n_tok = len(self._tok_to_id)
-        self.id_unk = self._tok_to_id[UNK]
+        self.tok_to_id_dict = load_tok_to_id(filename, special_tokens)
+        self.id_to_tok_dict = {idx: tok for tok, idx in self.tok_to_id_dict.iteritems()}
+        self.n_tok = len(self.tok_to_id_dict)
+        self.id_unk = self.tok_to_id_dict[UNK]
 
 
     def tok_to_id(self, tok):
-        return self._tok_to_id[tok] if tok in self._tok_to_id else self.id_unk
+        """ Convert a token to an id
+
+        Args:
+            self: (object) the class instance
+            tok: (string) the token to convert
+
+        Returns:
+            (string) id
+
+        """
+        return self.tok_to_id_dict[tok] if tok in self.tok_to_id_dict else self.id_unk
 
 
-    def id_to_tok(self, _id):
-        return self._id_to_tok[_id]
+    def id_to_tok(self, id):
+        """ Convert an id to a token
+
+        Args:
+            self: (object) the class instance
+            id: (string) the id to convert
+
+        Returns:
+            (string) token
+
+        """
+        return self.id_to_tok_dict[id]
 
 
 def build_vocab(code_dataset, min_count=1):
     """Build vocab from dataset"""
     print("Building vocab...")
     c = Counter()
-    for code_id, description,type_ in code_dataset:
+    for code_id, description in code_dataset:
         c.update(description)
     vocab = [tok for tok, count in c.items() if count >= min_count]
     print("- done. {}/{} tokens added to vocab.".format(len(vocab), len(c)))
@@ -65,7 +92,7 @@ def load_tok_to_id(filename, tokens=[]):
     """
     Args:
         filename: (string) path to vocab txt file one word per line
-        tokens: list of token to add to vocab after reading filename
+        tokens: (list) tokens to add to vocab after reading filename
 
     Returns:
         dict: d[token] = id
@@ -78,7 +105,8 @@ def load_tok_to_id(filename, tokens=[]):
             tok_to_id[token] = idx
 
     # add extra tokens
-    for tok in tokens:
-        tok_to_id[tok] = len(tok_to_id)
+    nbIds = len(tok_to_id)
+    for idx, tok in enumerate(tokens):
+        tok_to_id[tok] = nbIds + idx
 
     return tok_to_id

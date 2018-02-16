@@ -1,60 +1,139 @@
 import unicodedata
-import pandas as pd
-from nltk.stem import PorterStemmer as Stemmer
+import pymongo
 
 from config import UNK, PUNC
-from vocab import build_vocab
-
 
 class CodeDataset:
     """Loads codes and their description with some preprocessing"""
 
-    def __init__(self, path, vocab=None):
-        self._path = path
+    """ Class attributes """
+    # (int) number of instances created
+    _instances = 0
+    # (dict) contains all the ccam codes
+    _ccam_codes = {}
+    # (dict) contains all the cim codes
+    _cim_codes = {}
+
+    def __init__(self, db, vocab=None):
         self._vocab = vocab
-        self._data = load_csv_file(self._path)
-        self._stemmer = Stemmer()
+        self.__class__.loadCodes(db)
+        self.__class__._instances += 1
+        print "dataset loaded"
 
 
-    def __iter__(self):
-        for code_id, description  in self._data.items():
-            des = self.preprocess(description['description'])
-            if des is not None:
-                yield code_id, des, description['type'], description['tarif']
+    @classmethod
+    def formatCCAMCode(cls, code):
+        """ Format a CCAM code from database to the expected format for processing
+
+        Args:
+            cls: (object) the class itself
+            code: (object) ccam code from database
+
+        Returns:
+            key: (string) key to refer to in dictionnary
+            value: (object) formated ccam code
+
+        """
+        key = code["code"]
+        value = {
+            "descriptions": code["descriptions"],
+            "parent": code["parent"]
+        }
+        return key, value
 
 
-    def get_description(self, code_id):
-        return self._data[code_id]
+    @classmethod
+    def formatCIMCode(cls, code):
+        """ Format a CIM code from database to the expected format for processing
+
+        Args:
+            cls: (object) the class itself
+            code: (object) cim code from database
+
+        Returns:
+            key: (string) key to refer to in dictionnary
+            value: (object) formated cim code
+
+        """
+        key = code["code"]
+        value = {
+            "descriptions": code["descriptions"],
+            "chapter_nb": code["chapter_nb"]
+        }
+        return key, value
+
+
+    @classmethod
+    def loadCodes(cls, db):
+        """ Load ccam and cim codes from database
+
+        Args:
+            cls: (object) the class itself
+            db: (object) connection to the database
+
+        Returns:
+            none
+
+        """
+        if cls._instances == 0:
+            for code in db.ccam.find():
+                key, value = cls.formatCCAMCode(code)
+                cls._ccam_codes[key] = value
+
+            for code in db.cim.find():
+                key, value = cls.formatCIMCode(code)
+                cls._cim_codes[key] = value
+
+
+    def get_description(self, code_id, type_code):
+        """ Get the details of a code
+
+        Args:
+            self: (object) class instance
+            code_id: (string, object) id of the code
+            type_code: (string) either "CCAM" or "CIM"
+
+        Returns:
+            (object) details of the code, None if not in the dict
+
+        """
+        codes = self.__class__._ccam_codes if type_code == "CCAM" else self.__class__._cim_codes
+
+        if code_id not in codes:
+            return None
+        else:
+            return codes[code_id]
+
+
+    def build_descriptions(self, type_code):
+        """ Build descriptions for a specific set of codes
+
+        Args:
+            self: (object) class instance
+            type_code: (string) either "CCAM" or "CIM"
+
+        Returns:
+            (object) a generator to process descriptions one after an other that returns
+                code: (string, array) id of the code
+                descriptions: (array) preprocessed descriptions
+
+        """
+        codes = self.__class__._ccam_codes if type_code == "CCAM" else self.__class__._cim_codes
+
+        for code in codes:
+            details = codes[code]
+            descriptions = [self.preprocess(d) for d in details["descriptions"]]
+            if descriptions is not None:
+                yield code, descriptions
 
 
     def preprocess(self, description):
         """Preprocess description into a list of words or ids"""
         result = simple_tok(description)
-        if result is None:
-            return None
 
         if self._vocab is not None:
             result = [self._vocab.tok_to_id(tok) for tok in result]
         return result
-
-
-def load_csv_file(path):
-    """
-    Args:
-        path: (string) path to csv file with code and description
-
-    Returns:
-        d: (dict) d[code_id] = description
-
-    """
-    df = pd.read_csv(path, sep=";",names=['Code','Type','Description','Tarif']) if path is not None else None
-    data = {}
-    if df is not None:
-        for _, row in df.iterrows():
-            code_id = row["Code"]
-            description = row["Description"]
-            data[code_id] = { 'description' : description, 'type':row['Type'], 'tarif':row['Tarif'] }
-    return data
 
 
 def simple_tok(sentence):
@@ -66,8 +145,8 @@ def simple_tok(sentence):
         words_raw: (list of words) with no accents and no punctuation
 
     """
-    if sentence is None:
-        return None
+    if sentence is None or isinstance(sentence, (int, long)):
+        return [UNK]
 
     s = "".join(c.replace('"','') for c in sentence if c not in PUNC) # remove punc
     words_raw = s.strip().split(" ")  # split by space
