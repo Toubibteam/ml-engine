@@ -129,7 +129,7 @@ class Model:
         results = {}
         codes_descriptions = self.__class__._ccam_descriptions if type_code == 'CCAM' else self.__class__._cim_descriptions
         for code_id, descriptions in codes_descriptions.items():
-            if len(descriptions) > 2 :
+            if len(descriptions) > 1 :
                 occurence = 0
                 for description in descriptions :
                     metric = self.similarity(query, description)
