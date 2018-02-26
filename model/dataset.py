@@ -1,6 +1,6 @@
 import unicodedata
 
-from config import UNK, PUNC
+from tokenizer import Tokenizer
 
 class CodeDataset:
     """Loads codes and their description with some preprocessing"""
@@ -8,6 +8,8 @@ class CodeDataset:
     """ Class attributes """
     # (int) number of instances created
     _instances = 0
+    # (object) tokenizer
+    _tkz = Tokenizer()
     # (dict) contains all the ccam codes
     _ccam_codes = {}
     # (dict) contains all the cim codes
@@ -128,34 +130,8 @@ class CodeDataset:
 
     def preprocess(self, description):
         """Preprocess description into a list of words or ids"""
-        result = simple_tok(description)
+        result = self.__class__._tkz.tokenize(description)
 
         if self._vocab is not None:
             result = [self._vocab.tok_to_id(tok) for tok in result]
         return result
-
-
-def simple_tok(sentence):
-    """
-    Args:
-        sentence: (string) with accents etc.
-
-    Returns:
-        words_raw: (list of words) with no accents and no punctuation
-
-    """
-    if sentence is None or isinstance(sentence, (int, long)):
-        return [UNK]
-
-    s = "".join(c.replace('"','') for c in sentence if c not in PUNC) # remove punc
-    words_raw = s.strip().split(" ")  # split by space
-    words_raw = map(clean, words_raw) # remove accents
-    return words_raw
-
-
-def clean(word):
-    """Removes accents"""
-    if type(word) is not unicode: word = unicode(word, 'utf-8')
-    word = unicodedata.normalize('NFKD', word)
-    word = word.encode('ASCII', 'ignore')
-    return word
