@@ -2,7 +2,7 @@ from os import path
 import json
 import pymongo
 
-from dataset import CodeDataset, simple_tok, clean
+from dataset import CodeDataset, simple_tok
 from vocab import Vocab
 
 class Model:

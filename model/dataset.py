@@ -1,5 +1,4 @@
 import unicodedata
-import pymongo
 
 from config import UNK, PUNC
 
