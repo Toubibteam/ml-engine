@@ -1,7 +1,7 @@
 from collections import Counter
 
 from config import UNK
-
+from tokenizer import Tokenizer
 
 class Vocab(object):
     """ Class to handle the conversion between tokens and ids """
@@ -88,25 +88,27 @@ def write_vocab(vocab, filename):
     print("- done. {} tokens".format(i+1))
 
 
-def load_tok_to_id(filename, tokens=[]):
+def load_tok_to_id(filename, special_tokens=[]):
     """
     Args:
         filename: (string) path to vocab txt file one word per line
-        tokens: (list) tokens to add to vocab after reading filename
+        special_tokens: (list) tokens to add to vocab after reading filename
 
     Returns:
         dict: d[token] = id
 
     """
+    tkz = Tokenizer()
     tok_to_id = dict()
     with open(filename) as f:
-        for idx, token in enumerate(f):
-            token = token.strip()
-            tok_to_id[token] = idx
+        for idx, t in enumerate(f):
+            tokens = tkz.tokenize(t)
+            if len(tokens) != 0:
+                tok_to_id[''.join(tokens)] = idx
 
     # add extra tokens
     nbIds = len(tok_to_id)
-    for idx, tok in enumerate(tokens):
+    for idx, tok in enumerate(special_tokens):
         tok_to_id[tok] = nbIds + idx
 
     return tok_to_id

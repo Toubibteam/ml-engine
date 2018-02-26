@@ -71,7 +71,14 @@ class Model:
         if cls._instances == 0:
             folder = path.abspath(path.split(__file__)[0])
             with open(folder + '/data/vocab.txt','r') as df :
-                cls._vocab = df.read().split('\n')
+                content = df.read().split('\n')
+
+            vocab = []
+            for c in content:
+                tokens = cls._tkz.tokenize(c)
+                if len(tokens) != 0:
+                    vocab.append(''.join(tokens))
+            cls._vocab = vocab
 
             cls._all_vocab = Vocab(folder + "/data/vocab_all.txt")
 
