@@ -1,6 +1,3 @@
-,
-(
-)
 de
 a
 en
@@ -10,9 +7,8 @@ ou
 des
 avec
 par
-:
-.
-d'autres
+d
+autres
 sans
 participant
 connu
@@ -35,11 +31,11 @@ voir
 precision
 dans
 n
--
 travail
-d'un
+d
+un
 s
-exerAant
+exerçant
 Syndrome
 l
 lieu
@@ -55,7 +51,8 @@ autres
 precisee
 droite
 precisees
-d'une
+d
+une
 Maladie
 aigue
 au
@@ -95,8 +92,6 @@ determinee
 y
 agricole
 industriel
-[
-]
 zone
 domicile
 route
@@ -182,7 +177,8 @@ Auto-intoxication
 Affection
 diffuse
 exterieur
-et/ou
+et
+ou
 Region
 Envahissement
 classes
@@ -231,7 +227,6 @@ x
 paroi
 severe
 unique
-***
 superieure
 pieton
 selon
@@ -293,7 +288,8 @@ familiale
 entre
 senile
 grande
-d'eau
+d
+eau
 ouvrage
 flammes
 btiment
@@ -315,7 +311,6 @@ Retrecissement
 Defaillance
 eclatement
 cou
-+/-
 thor.tomie
 symptUmes
 tete
