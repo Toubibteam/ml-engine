@@ -2,7 +2,8 @@ from os import path
 import json
 import pymongo
 
-from dataset import CodeDataset, simple_tok, clean
+from dataset import CodeDataset
+from tokenizer import Tokenizer
 from vocab import Vocab
 
 class Model:
@@ -11,6 +12,8 @@ class Model:
     """ Class attributes """
     # (int) number of instances created
     _instances = 0
+    # (object) tokenizer
+    _tkz = Tokenizer()
     # (array) contains all the vocabulary to enrich queries
     _vocab = []
     # (object) handle the token / id convertion
@@ -68,7 +71,14 @@ class Model:
         if cls._instances == 0:
             folder = path.abspath(path.split(__file__)[0])
             with open(folder + '/data/vocab.txt','r') as df :
-                cls._vocab = df.read().split('\n')
+                content = df.read().split('\n')
+
+            vocab = []
+            for c in content:
+                tokens = cls._tkz.tokenize(c)
+                if len(tokens) != 0:
+                    vocab.append(''.join(tokens))
+            cls._vocab = vocab
 
             cls._all_vocab = Vocab(folder + "/data/vocab_all.txt")
 
@@ -106,7 +116,7 @@ class Model:
         return self.__class__._code_dataset.preprocess(query)
 
     def change_query(self,query,type_code) :
-        query = simple_tok(query)
+        query = self.__class__._tkz.tokenize(query)
         new_query = ''
         syn = self.__class__._ccam_syn if type_code == 'CCAM' else self.__class__._cim_syn
         for word in query :
