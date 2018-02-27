@@ -37,8 +37,9 @@ class CodeDataset:
         """
         key = code["code"]
         value = {
-            "descriptions": code["descriptions"],
-            "parent": code["parent"]
+            "description": code["description"],
+            "keywords": code["keywords"],
+            "tarif": code["tarif"]
         }
         return key, value
 
@@ -58,8 +59,9 @@ class CodeDataset:
         """
         key = code["code"]
         value = {
-            "descriptions": code["descriptions"],
-            "chapter_nb": code["chapter_nb"]
+            "description": code["description"],
+            "keywords": code["keywords"],
+            "tarif": code["tarif"]
         }
         return key, value
 
