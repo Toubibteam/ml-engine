@@ -25,7 +25,7 @@ class Tokenizer:
         if self.__class__._instances == 0:
             # load stopwords once for all
             folder = path.abspath(path.split(__file__)[0])
-            with open(folder + '/data/stopwords24218.txt','r') as df :
+            with open(folder + '/data/stopwords.txt','r') as df :
                 content = df.read().strip().split('\n')
 
             stopwords = []
