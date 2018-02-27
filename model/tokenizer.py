@@ -59,10 +59,10 @@ class Tokenizer:
         s = s.lower()
         # split by words and remove empty strings
         tokens = s.split()
-        # remove stop words
-        tokens = [ t for t in tokens if not t in self.__class__._stopwords ]
         # stem words
         tokens = [ self.__class__._stemmer.stem(t) for t in tokens ]
+        # remove stop words
+        tokens = [ t for t in tokens if not t in self.__class__._stopwords ]
         return tokens
 
 
