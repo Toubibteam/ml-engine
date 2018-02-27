@@ -125,14 +125,18 @@ class CodeDataset:
 
         for code in codes:
             details = codes[code]
-            descriptions = [self.preprocess(d) for d in details["descriptions"]]
-            if descriptions is not None:
-                yield code, descriptions
+
+            keywords = {}
+            for kw in details["keywords"]:
+                keywords[self._vocab.tok_to_id(kw["word"])] = kw["w"]
+
+            if keywords is not None:
+                yield code, keywords
 
 
     def preprocess(self, description):
         """Preprocess description into a list of words or ids"""
-        result = self.__class__._tkz.tokenize(description)
+        result = description.strip().split()
 
         if self._vocab is not None:
             result = [self._vocab.tok_to_id(tok) for tok in result]
