@@ -1,15 +1,11 @@
 import unicodedata
 
-from tokenizer import Tokenizer
-
 class CodeDataset:
     """Loads codes and their description with some preprocessing"""
 
     """ Class attributes """
     # (int) number of instances created
     _instances = 0
-    # (object) tokenizer
-    _tkz = Tokenizer()
     # (dict) contains all the ccam codes
     _ccam_codes = {}
     # (dict) contains all the cim codes
