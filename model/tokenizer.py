@@ -26,15 +26,7 @@ class Tokenizer:
             # load stopwords once for all
             folder = path.abspath(path.split(__file__)[0])
             with open(folder + '/data/stopwords.txt','r') as df :
-                content = df.read().strip().split('\n')
-
-            stopwords = []
-            for c in content:
-                stopwords.append(''.join(self.tokenize(c)))
-
-            # remove duplications
-            stopwords = set(stopwords)
-            self.__class__._stopwords = stopwords
+                self.__class__._stopwords = df.read().strip().split('\n')
         self.__class__._instances += 1
 
 
