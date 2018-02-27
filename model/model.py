@@ -24,9 +24,9 @@ class Model:
     _ccam_syn = {}
     # (dict) contains all the cim synonyms
     _cim_syn = {}
-    # (dict) contains all the ccam preprocessed descriptions. The keys are the code ids
+    # (dict) contains all the ccam preprocessed keywords associated to each code. The keys are the code ids
     _ccam_descriptions = {}
-    # (dict) contains all the cim preprocessed descriptions. The keys are the code ids
+    # (dict) contains all the cim preprocessed keywords associated to each code. The keys are the code ids
     _cim_descriptions = {}
 
     def __init__(self,db):
@@ -96,10 +96,28 @@ class Model:
 
 
     @classmethod
-    def similarity(cls, query, description):
+    def similarity(cls, query, keywords):
+        """ Compute the similarity between two sets of words
+
+        Args:
+            cls: (object) the class itself
+            query: (string) user's query
+            keywords: (array) contains dict
+                word: (string | number) keyword
+                w: (number) weight of the keyword
+
+        Returns:
+            similarity: (int)
+
+        """
+
         q = set(query)
-        d = set(description)
-        return len(q.intersection(d))
+        d = set(keywords.keys())
+
+        similarity = 0
+        for k in q.intersection(d):
+            similarity += keywords[k]
+        return similarity
 
     @classmethod
     def description_representation(cls, description):
@@ -131,31 +149,15 @@ class Model:
         query = self.query_representation(query)
         results = {}
         codes_descriptions = self.__class__._ccam_descriptions if type_code == 'CCAM' else self.__class__._cim_descriptions
-        for code_id, descriptions in codes_descriptions.items():
-            if len(descriptions) > 1 :
-                occurence = 0
-                for description in descriptions :
-                    metric = self.similarity(query, description)
-                    if metric > 0:
-                        occurence += 1
-                if occurence > 1 :
-                    code_des = self.__class__._code_dataset.get_description(code_id, type_code)
-                    if code_des is not None:
-                        results[code_id] = {
-                            "metric": metric,
-                            "description": code_des["descriptions"][0],
-                            "type" : type_code
-                        }
-            else :
-                metric = self.similarity(query, descriptions[0])
-                if metric > 0 :
-                    code_des = self.__class__._code_dataset.get_description(code_id, type_code)
-                    if code_des is not None:
-                        results[code_id] = {
-                            "metric": metric,
-                            "description": code_des["descriptions"][0],
-                            "type" : type_code
-                        }
+        for code_id, keywords in codes_descriptions.items():
+            metric = self.similarity(query, keywords)
+            if metric > 0 :
+                code_des = self.__class__._code_dataset.get_description(code_id, type_code)["description"]
+                results[code_id] = {
+                    "metric": metric,
+                    "description": code_des,
+                    "type" : type_code
+                }
 
         return results
 
