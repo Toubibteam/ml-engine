@@ -25,16 +25,8 @@ class Tokenizer:
         if self.__class__._instances == 0:
             # load stopwords once for all
             folder = path.abspath(path.split(__file__)[0])
-            with open(folder + '/data/stopwords24218.txt','r') as df :
-                content = df.read().strip().split('\n')
-
-            stopwords = []
-            for c in content:
-                stopwords.append(''.join(self.tokenize(c)))
-
-            # remove duplications
-            stopwords = set(stopwords)
-            self.__class__._stopwords = stopwords
+            with open(folder + '/data/stopwords.txt','r') as df :
+                self.__class__._stopwords = df.read().strip().split('\n')
         self.__class__._instances += 1
 
 
@@ -59,10 +51,10 @@ class Tokenizer:
         s = s.lower()
         # split by words and remove empty strings
         tokens = s.split()
-        # remove stop words
-        tokens = [ t for t in tokens if not t in self.__class__._stopwords ]
         # stem words
         tokens = [ self.__class__._stemmer.stem(t) for t in tokens ]
+        # remove stop words
+        tokens = [ t for t in tokens if not t in self.__class__._stopwords ]
         return tokens
 
 

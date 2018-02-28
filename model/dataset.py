@@ -1,15 +1,11 @@
 import unicodedata
 
-from tokenizer import Tokenizer
-
 class CodeDataset:
     """Loads codes and their description with some preprocessing"""
 
     """ Class attributes """
     # (int) number of instances created
     _instances = 0
-    # (object) tokenizer
-    _tkz = Tokenizer()
     # (dict) contains all the ccam codes
     _ccam_codes = {}
     # (dict) contains all the cim codes
@@ -37,8 +33,9 @@ class CodeDataset:
         """
         key = code["code"]
         value = {
-            "descriptions": code["descriptions"],
-            "parent": code["parent"]
+            "description": code["description"],
+            "keywords": code["keywords"],
+            "tarif": code["tarif"]
         }
         return key, value
 
@@ -58,8 +55,9 @@ class CodeDataset:
         """
         key = code["code"]
         value = {
-            "descriptions": code["descriptions"],
-            "chapter_nb": code["chapter_nb"]
+            "description": code["description"],
+            "keywords": code["keywords"],
+            "tarif": code["tarif"]
         }
         return key, value
 
@@ -123,15 +121,10 @@ class CodeDataset:
 
         for code in codes:
             details = codes[code]
-            descriptions = [self.preprocess(d) for d in details["descriptions"]]
-            if descriptions is not None:
-                yield code, descriptions
 
+            keywords = {}
+            for kw in details["keywords"]:
+                keywords[self._vocab.tok_to_id(kw["word"])] = kw["w"]
 
-    def preprocess(self, description):
-        """Preprocess description into a list of words or ids"""
-        result = self.__class__._tkz.tokenize(description)
-
-        if self._vocab is not None:
-            result = [self._vocab.tok_to_id(tok) for tok in result]
-        return result
+            if keywords is not None:
+                yield code, keywords
