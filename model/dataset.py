@@ -128,12 +128,3 @@ class CodeDataset:
 
             if keywords is not None:
                 yield code, keywords
-
-
-    def preprocess(self, description):
-        """Preprocess description into a list of words or ids"""
-        result = description.strip().split()
-
-        if self._vocab is not None:
-            result = [self._vocab.tok_to_id(tok) for tok in result]
-        return result
