@@ -123,30 +123,40 @@ class Model:
     def description_representation(cls, description):
         return description
 
-    def query_representation(self, query):
-        return self.__class__._code_dataset.preprocess(query)
 
-    def change_query(self,query,type_code) :
-        query = self.__class__._tkz.tokenize(query)
-        new_query = ''
-        syn = self.__class__._ccam_syn if type_code == 'CCAM' else self.__class__._cim_syn
-        for word in query :
-            if word in self.__class__._vocab :
-                new_query += word + ' '
-            else :
-                if word in syn.keys() :
-                    temp = syn[word]
-                    synonymes = [t['syn'] for t in temp]
-                    weights = [t['weight'] for t in temp]
-                    weights, synonymes = zip(*sorted(zip(weights, synonymes)))
-                    new_query = synonymes[0] + ' '
-                else :
-                    new_query += ''
-        return new_query
+    def preprocess_query(self, query, type_code):
+        """ Preprocess a query for computation
+
+        Args:
+            self: (object) class instance
+            query: (string) user's query
+            type_code: (string) either "CCAM" or "CIM"
+
+        Returns:
+            ids: (list) ids of each word
+
+        """
+        tokens = self.__class__._tkz.tokenize(query)
+        new_tokens = []
+        list_synonyms = self.__class__._ccam_syn if type_code == 'CCAM' else self.__class__._cim_syn
+        for token in tokens:
+            if token in self.__class__._vocab:
+                new_tokens.append(token)
+            else:
+                if token in list_synonyms:
+                    syn, weights = [], []
+                    for item in list_synonyms[token]:
+                        syn.append(item["syn"])
+                        weights.append(item["weight"])
+                    weights, syn = zip(*sorted(zip(weights, syn)))
+                    new_tokens.append(syn[0])
+
+        ids = [ self.__class__._all_vocab.tok_to_id(token) for token in new_tokens ]
+        return ids
+
 
     def predict(self, query, type_code):
-        query = self.change_query(query,type_code)
-        query = self.query_representation(query)
+        query = self.preprocess_query(query, type_code)
         results = {}
         codes_descriptions = self.__class__._ccam_descriptions if type_code == 'CCAM' else self.__class__._cim_descriptions
         for code_id, keywords in codes_descriptions.items():
